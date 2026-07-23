@@ -57,7 +57,8 @@ class VideoGameBenchAgent:
                  context_window: int = 10, 
                  log_dir: Optional[Path] = None,
                  enable_ui: bool = False,
-                 api_base: Optional[str] = None):
+                 api_base: Optional[str] = None,
+                 request_timeout: float = 300.0):
         # Set up logging directory
         if log_dir is None:
             model_name = model.replace("/", "-").replace(".", "-")
@@ -77,7 +78,8 @@ class VideoGameBenchAgent:
             temperature=temperature,
             max_tokens=max_tokens,
             log_dir=self.log_dir / "llm",
-            api_base=api_base
+            api_base=api_base,
+            request_timeout=request_timeout,
         )
 
         # Common attributes
@@ -255,7 +257,8 @@ class GameBoyVGAgent(VideoGameBenchAgent):
         log_dir: Optional[Path] = None,
         realtime: bool = False,
         enable_ui: bool = False,
-        api_base: Optional[str] = None
+        api_base: Optional[str] = None,
+        request_timeout: float = 300.0,
     ):
         """
         Initialize the GBA agent.
@@ -282,7 +285,8 @@ class GameBoyVGAgent(VideoGameBenchAgent):
             log_dir=log_dir,
             enable_ui=enable_ui,
             task_prompt=task_prompt,
-            api_base=api_base
+            api_base=api_base,
+            request_timeout=request_timeout,
         )
         
         self.realtime = realtime
@@ -465,7 +469,8 @@ class WebBrowsingVGAgent(VideoGameBenchAgent):
         press_key_delay: int = 100,
         log_dir: Optional[Path] = None,
         enable_ui: bool = False,
-        api_base: Optional[str] = None
+        api_base: Optional[str] = None,
+        request_timeout: float = 300.0,
     ):
         """
         Initialize the web browsing agent.
@@ -495,7 +500,8 @@ class WebBrowsingVGAgent(VideoGameBenchAgent):
             log_dir=log_dir,
             enable_ui=enable_ui,
             task_prompt=task_prompt,
-            api_base=api_base
+            api_base=api_base,
+            request_timeout=request_timeout,
         )
         
         # Initialize browser controller
@@ -534,32 +540,12 @@ class WebBrowsingVGAgent(VideoGameBenchAgent):
         pass
         
     
-    async def save_to_history(self, frame):
-        """
-        Save the frame to the LLM context history by first decoding
-        to the right format.
-        """
-        base64_image = base64.b64encode(frame).decode("utf-8")
-        user_content = [
-            {
-                "type": "text",
-                "text": "Frame:"
-            },
-            {
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/jpeg;base64,{base64_image}"
-                }
-            }
-        ]
-        self.add_to_history("user", user_content, has_image=True)
-
-    
     async def store_observation(self, frames: List[bytes]) -> None:
-        # Save screenshot as current "step" representative frame
+        # Keep image bytes only for the current decision. Persisting them in
+        # context_history would resend old screenshots on every later request,
+        # while get_action already attaches the current frames once.
         for i, frame in enumerate(frames):
             self.frames.append(frame)
-            await self.save_to_history(frame)
 
             filename = f"game_screen_step_{self.step_count}.jpg" if len(frames) == 1 else f"game_screen_step_{self.step_count}_{i}.jpg"
             screenshot_path = self.screenshot_dir / filename
@@ -598,7 +584,7 @@ class WebBrowsingVGAgent(VideoGameBenchAgent):
         """
         # Update conversation history with observation
 
-        self.context_history.append(Message(role="user", content=f"Observation: {info}"))
+        self.add_to_history("user", f"Observation: {info}")
 
         await self.store_observation(frames)
 
@@ -630,11 +616,13 @@ class WebBrowsingVGAgent(VideoGameBenchAgent):
 
         # Generate the next action using ReACT
         start_time = time.time()
-        # Add reflection prompt to the task
+        # The game-specific task is already present in the system prompt. Keep
+        # this per-step reminder short to reduce local multimodal inference time.
         task_with_reflection = (
-            f"{REFLECTION_PROMPT}\n\n[memory]:\n{self.reflection_memory}"
-            f"Your mouse is currently at coordinates: {browser.current_mouse_position}. Move it with move or drag actions."
-            f"{self.task_prompt}\n\n"
+            "Inspect the latest screen and choose the next action. Preserve any "
+            "still-relevant prior information in the JSON memory field.\n"
+            f"Current memory: {self.reflection_memory or '(empty)'}\n"
+            f"Current mouse position: {browser.current_mouse_position}."
         )
         
         # Prune screenshots to only keep the latest context_window
@@ -680,12 +668,11 @@ class WebBrowsingVGAgent(VideoGameBenchAgent):
             logger.info(f"Action: {action}, Input: {action_input}")
 
             # Update the conversation history
-            self.context_history.append(Message(role="assistant", content=json.dumps({
-                    "thought": thought,
-                    "action": action,
-                    "action_input": action_input
-                })
-            ))
+            self.add_to_history("assistant", json.dumps({
+                "thought": thought,
+                "action": action,
+                "action_input": action_input
+            }))
 
             self.step_count = step + 1
             return action, action_input

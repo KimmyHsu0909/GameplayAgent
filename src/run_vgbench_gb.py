@@ -69,6 +69,7 @@ async def run_gba_emulator(args):
         enable_ui=args.enable_ui,
         task_prompt=args.task_prompt,
         api_base=args.api_base,
+        request_timeout=args.request_timeout,
     )
     print(f"Using VGagent on VideoGameBench with model: {model}")
     

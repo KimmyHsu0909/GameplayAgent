@@ -131,6 +131,15 @@ class DOSGameInterface(VideoGameBenchInterface):
         result = f"Held key {key} for {duration} seconds"
         return result
 
+    async def wait(self, action_input: str, _press_key_delay_ms: float = 100) -> str:
+        """Wait without sending mouse or keyboard input."""
+        duration_text = (action_input or "").strip()
+        duration = float(duration_text) if duration_text else 0.5
+        if not 0 <= duration <= 5:
+            raise ValueError("wait duration must be between 0 and 5 seconds")
+
+        await asyncio.sleep(duration)
+        return f"Waited for {duration:g} seconds"
 
     async def step(self, 
                     action: str, 
@@ -163,6 +172,7 @@ class DOSGameInterface(VideoGameBenchInterface):
                 'write': self.write,
                 'press_key': self.press_key,
                 'hold_key': self.hold_key,
+                'wait': self.wait,
             }
 
             if action is None:

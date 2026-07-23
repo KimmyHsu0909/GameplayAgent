@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VGbench Diagnostics Game: Maze</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            background-color: #f0f0f0;
+        }
+
+        #maze-container {
+            display: grid; /* We'll set grid-template-columns/rows via JS */
+            border: 2px solid #333; /* Main border for the maze container */
+            background-color: #fff;
+            margin-top: 20px;
+            /* The container itself has a border, so individual cell borders
+               on the outside edge might look slightly thicker.
+               Alternatively, we could remove this container border and
+               rely solely on cell borders, but this gives a clearer maze boundary. */
+        }
+
+        .cell {
+            width: 30px; /* Size of each cell */
+            height: 30px;
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            border: 1px solid #ddd; /* Light grey gridlines for each cell */
+        }
+
+        .path {
+            background-color: #eee; /* Light gray for path */
+        }
+
+        .wall {
+            background-color: #555; /* Dark gray for walls */
+        }
+
+        .player {
+            background-color: red !important; /* Red square for player, important to override path */
+            border-radius: 2px; /* Slightly rounded corners for the player */
+        }
+
+        .start {
+            /* background-color: lightblue; Optional: style start differently if not player */
+        }
+
+        .end {
+            background-color: lightgreen; /* Green for the end goal */
+        }
+
+        #game-info {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        #message-display {
+            margin-top: 15px;
+            font-size: 1.2em;
+            color: green;
+            font-weight: bold;
+            min-height: 1.5em; /* Reserve space to avoid layout shifts */
+        }
+    </style>
+</head>
+<body>
+    <h1>VGbench Diagnostics Game: Maze</h1>
+    <p>Use Arrow Keys to Move the Red Square to the Green Square!</p>
+    <div id="game-info">
+        Level: <span id="level-display">1</span>
+    </div>
+    <div id="maze-container">
+        <!-- Maze will be generated here by JavaScript -->
+    </div>
+    <p id="message-display"></p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mazeContainer = document.getElementById('maze-container');
+            const levelDisplay = document.getElementById('level-display');
+            const messageDisplay = document.getElementById('message-display');
+            const cellSize = 30; // Must match CSS .cell width/height
+
+            // Maze Definitions:
+            // 'S': Start, 'E': End, '0': Path, '1': Wall
+            const levels = [
+                // Level 1: Straight line
+                {
+                    grid: [
+                        ['S', '0', '0', '0', 'E']
+                    ]
+                },
+                // Level 2: 90-degree turn
+                {
+                    grid: [
+                        ['S', '0', '0', '0', '1'],
+                        ['1', '1', '1', '0', '1'],
+                        ['1', '1', '1', '0', 'E']
+                    ]
+                },
+                // Level 3: Simple U-turn
+                {
+                    grid: [
+                        ['S', '0', '0', '1', '1'],
+                        ['1', '1', '0', '0', '1'],
+                        ['1', '1', '1', '0', 'E']
+                    ]
+                },
+                // Level 4: A bit more challenging box with turns
+                {
+                    grid: [
+                        ['1', '1', '1', '1', '1', '1'],
+                        ['1', 'S', '0', '1', 'E', '1'],
+                        ['1', '1', '0', '0', '0', '1'],
+                        ['1', '1', '1', '1', '1', '1']
+                    ]
+                },
+                // Level 5: A bit longer path
+                {
+                    grid: [
+                        ['S', '0', '1', '1', '1'],
+                        ['1', '0', '0', '0', '1'],
+                        ['1', '1', '1', '0', 'E']
+                    ]
+                },
+                // Level 6: Multiple turns
+                {
+                    grid: [
+                        ['S', '0', '0', '1', '1'],
+                        ['1', '1', '0', '1', 'E'],
+                        ['1', '1', '0', '0', '0']
+                    ]
+                },
+                // Level 7: Dead end and a detour
+                {
+                    grid: [
+                        ['1', 'S', '0', '0', '1'],
+                        ['1', '1', '1', '0', '1'],
+                        ['E', '0', '0', '0', '1'],
+                        ['1', '1', '1', '0', '1'],
+                        ['1', '1', '1', '0', '1']
+                    ]
+                },
+                // Level 8: Slightly more complex with choices
+                {
+                    grid: [
+                        ['S', '0', '1', '0', '0'],
+                        ['1', '0', '1', '0', '1'],
+                        ['0', '0', '0', '0', 'E'],
+                        ['0', '1', '1', '1', '1'],
+                        ['0', '0', '0', '0', '0']
+                    ]
+                },
+                // Level 9: A little zig-zag with a false path
+                {
+                    grid: [
+                        ['S', '0', '1', '1', '1', '1'],
+                        ['1', '0', '0', '0', '1', '0'],
+                        ['1', '1', '1', '0', '1', '1'],
+                        ['1', 'E', '0', '0', '0', '1']
+                    ]
+                },
+                // Level 10: Final challenge
+                {
+                    grid: [
+                        ['S', '0', '0', '1', '0', '0'],
+                        ['1', '1', '0', '1', '0', '1'],
+                        ['0', '0', '0', '0', '0', '1'],
+                        ['0', '1', '1', '0', '1', '1'],
+                        ['0', '0', 'E', '0', '0', '0']
+                    ]
+                }
+            ];
+
+            let currentLevelIndex = 0;
+            let playerPos = { x: 0, y: 0 };
+            let currentMaze;
+
+            function findChar(char, grid) {
+                for (let y = 0; y < grid.length; y++) {
+                    for (let x = 0; x < grid[y].length; x++) {
+                        if (grid[y][x] === char) {
+                            return { x, y };
+                        }
+                    }
+                }
+                console.error("Character " + char + " not found in grid!");
+                return null;
+            }
+
+            function loadLevel(levelIndex) {
+                if (levelIndex >= levels.length) {
+                    mazeContainer.innerHTML = ''; // Clear maze
+                    messageDisplay.textContent = "Congratulations! You beat all levels!";
+                    messageDisplay.style.color = 'blue';
+                    window.removeEventListener('keydown', handleKeyPress); // Stop listening for keys
+                    return;
+                }
+
+                currentLevelIndex = levelIndex;
+                currentMaze = levels[currentLevelIndex].grid;
+                const startPos = findChar('S', currentMaze);
+                if (!startPos) return;
+                playerPos = { ...startPos };
+
+                levelDisplay.textContent = currentLevelIndex + 1;
+                messageDisplay.textContent = '';
+                drawMaze();
+            }
+
+            function drawMaze() {
+                if (!currentMaze) return;
+
+                mazeContainer.innerHTML = '';
+                const rows = currentMaze.length;
+                const cols = currentMaze[0].length;
+
+                mazeContainer.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
+                mazeContainer.style.gridTemplateRows = `repeat(${rows}, ${cellSize}px)`;
+                mazeContainer.style.width = `${cols * cellSize}px`;
+                mazeContainer.style.height = `${rows * cellSize}px`;
+
+                for (let y = 0; y < rows; y++) {
+                    for (let x = 0; x < cols; x++) {
+                        const cell = document.createElement('div');
+                        cell.classList.add('cell');
+                        const cellType = currentMaze[y][x];
+
+                        if (cellType === '1') {
+                            cell.classList.add('wall');
+                        } else if (cellType === '0') {
+                            cell.classList.add('path');
+                        } else if (cellType === 'S') {
+                            cell.classList.add('start', 'path');
+                        } else if (cellType === 'E') {
+                            cell.classList.add('end', 'path');
+                        }
+
+                        if (playerPos.x === x && playerPos.y === y) {
+                            cell.classList.add('player');
+                        }
+                        mazeContainer.appendChild(cell);
+                    }
+                }
+            }
+
+            function movePlayer(dx, dy) {
+                if (!currentMaze) return;
+
+                const newX = playerPos.x + dx;
+                const newY = playerPos.y + dy;
+
+                if (newX < 0 || newX >= currentMaze[0].length || newY < 0 || newY >= currentMaze.length) {
+                    return;
+                }
+
+                if (currentMaze[newY][newX] === '1') {
+                    return;
+                }
+
+                playerPos.x = newX;
+                playerPos.y = newY;
+
+                drawMaze();
+
+                if (currentMaze[playerPos.y][playerPos.x] === 'E') {
+                    messageDisplay.textContent = `Level ${currentLevelIndex + 1} Complete!`;
+                    messageDisplay.style.color = 'green';
+                    window.removeEventListener('keydown', handleKeyPress);
+                    setTimeout(() => {
+                        loadLevel(currentLevelIndex + 1);
+                        if (currentLevelIndex < levels.length) {
+                             window.addEventListener('keydown', handleKeyPress);
+                        }
+                    }, 1000);
+                }
+            }
+
+            function handleKeyPress(event) {
+                if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
+                    event.preventDefault();
+                }
+
+                switch (event.key) {
+                    case 'ArrowUp':
+                        movePlayer(0, -1);
+                        break;
+                    case 'ArrowDown':
+                        movePlayer(0, 1);
+                        break;
+                    case 'ArrowLeft':
+                        movePlayer(-1, 0);
+                        break;
+                    case 'ArrowRight':
+                        movePlayer(1, 0);
+                        break;
+                }
+            }
+
+            window.addEventListener('keydown', handleKeyPress);
+            loadLevel(0);
+        });
+    </script>
+</body>
+</html>

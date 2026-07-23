@@ -1,0 +1,75 @@
+You are playing Civilization on DOS. Your goal is to build a city, research technology, and complete this campaign.
+You will be playing as the Romans in Chieftain mode (the easiest mode) and there will be 7 civilizations.
+
+You can click and drag the mouse to select objects, characters, buildings, etc. and also use your keyboard keys to move.
+Game Objectives
+
+Win Conditions: Achieve global dominance by conquering all other civilizations or be the first to send a spaceship to Alpha Centauri.
+
+Core Goals: Expand your civilization by building cities, managing resources, advancing technology, engaging in diplomacy, and waging war if necessary.
+
+If you get stuck on a screen, try clicking or pressing enter to see if the screen changes! If you're trying to move your units and
+they are not moving, it means you are trying to move over invalid terrain -- try another direction or action!
+
+Make sure to remember all of the following facts:
+1. Ground troops cannot walk through water (the blue regions), mountains, or other obstacles. 
+2. End your turn when you're finished with what you want to do.
+3. Each unit moves 1 tile. So if you want to move another unit, move the selected unit first.
+4. In the beginning, a good strategy is to just explore and have your units move around and explore unseen areas.
+
+General Controls
+    Mouse: Click to select units, cities, and menu options. Right-click may provide additional info.
+
+    Keyboard Shortcuts:
+        Movement: Arrow keys (or Numpad) to move selected unit.
+        End Turn: Enter key.
+        Access City Menu: Click on a city or press C.
+        Change Tax/Science/Luxury Rates: F1 (Tax Advisor).
+        Access Civilopedia: F10.
+        Save Game: Shift + S.
+        Load Game: Shift + L.
+        View Military Advisor: F3.
+        View Diplomacy Screen: F4.
+        View World Map: F5.
+
+City Management
+    Found City: Move settler unit to an empty tile and press B.
+    Manage Production: Click on a city, then choose what to build (units, buildings, wonders).
+    Adjust Citizen Tasks: Click on tiles within city radius to assign workers.
+
+Unit Management
+    Move Units: Use arrow keys or Numpad.
+    Fortify Unit: Press F to make the unit stay in place and defend.
+    Skip Turn: Spacebar.
+    Disband Unit: Press D.
+    Activate Next Unit: N key.
+
+Combat & Diplomacy
+    Attack Enemy: Move military unit onto an enemy unit or city.
+    Negotiate Diplomacy: Open diplomacy screen (F4) and select a civilization to negotiate with.
+    Declare War: Refuse enemy demands or attack their units/cities.
+
+Research & Progression
+    Select New Technology: Open the Science Advisor menu (F6) and choose a research path.
+    Advance Eras: Progress by researching key technologies.
+    Build Wonders: Unique, powerful structures that provide long-term benefits.
+
+Unit Management
+    Move: Arrow keys or Numpad (1-9, except 5) for movement.
+    Fortify (F): Increases defense by 50%, unit remains stationary.
+    Sentry (S): Unit does not require orders each turn but activates when an enemy approaches.
+    Skip Turn (W): Temporarily skip a unit and return to it later.
+    No Movement (Spacebar): Ends the unit's turn without action.
+    Activate Fortified/Sentry Unit: Click the unit or select from the city menu.
+    Unload from Ship (U): Unloads units from a transport ship.
+    Go To Command (G): Orders the unit to move to a specified location.
+    Change Home City (H): Assigns a new home city, used for air unit refueling.
+    Disband (Shift + D): Removes the unit permanently.
+    Pillage (Shift + P): Destroys improvements on a tile.
+
+City Management
+    Found a City (B): Settler establishes a new city.
+    Grow a City (B in existing city): Settler increases city population.
+    Manage Production: Select what to build (units, buildings, wonders).
+    Adjust Citizen Tasks: Assign workers to different tiles.
+    Set Tax/Science/Luxury Rates (F1): Adjust economy. 

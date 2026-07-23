@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Civilization</title>
+  <script src="https://js-dos.com/6.22/current/js-dos.js"></script>
+  <style>
+    body {
+      margin: 0;
+      position: relative;
+    }
+    .container {
+      position: relative;
+      width: 640px;
+      height: 400px;
+      z-index: 1;
+    }
+    canvas {
+      width: 640px;
+      height: 400px;
+    }
+    .grid-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;  /* Increased z-index to appear on top */
+    }
+
+    #mousePosition, .mousePoint {
+      position: fixed;
+      pointer-events: none;
+      z-index: 1001;
+      font-size: 10px;
+      color: blue;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transform: translate(0px, 0px);
+      white-space: nowrap;
+    }
+
+    #mousePosition::before {
+      content: '🮰';
+      font-size: 16px;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .mousePoint::before {
+      content: '•';
+      font-size: 16px;
+      color: rgba(0, 0, 255, 0.75);
+      display: inline-block;
+      text-align: center;
+    }
+
+    .grid-point {
+      position: absolute;
+      font-size: 10px;
+      color: rgba(255, 0, 0, 1.0);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999;  /* Just below the coordinate points */
+      background-image:
+        linear-gradient(to right, rgba(255,0,0,0.15) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,0,0,0.15) 1px, transparent 1px);
+      background-size: 100px 100px;
+    }
+  </style>
+</head>
+
+<body>
+    <div id="mousePosition"></div>
+    <div id="mousePointUp" class="mousePoint"></div>
+    <div id="mousePointDown" class="mousePoint"></div>
+    <div id="mousePointLeft" class="mousePoint"></div>
+    <div id="mousePointRight" class="mousePoint"></div>
+    <div class="grid-container" id="gridContainer"></div>
+    <div class="grid"></div>
+    <div class="container">
+        <canvas id="jsdos"></canvas>
+    </div>
+    <script>
+        // Add grid coordinates
+        function addGridCoordinates() {
+            const container = document.getElementById('gridContainer');
+            const viewportWidth = Math.ceil(window.innerWidth / 100);
+            const viewportHeight = Math.ceil(window.innerHeight / 100);
+
+            container.innerHTML = '';
+            for (let x = 0; x < viewportWidth; x++) {
+                for (let y = 0; y < viewportHeight; y++) {
+                    const point = document.createElement('div');
+                    point.className = 'grid-point';
+                    point.style.left = (x * 100) + 'px';
+                    point.style.top = (y * 100) + 'px';
+                    point.textContent = `(${x},${y})`;
+                    container.appendChild(point);
+                }
+            }
+        }
+
+        // Add mouse position tracking
+        const mousePosition = document.getElementById('mousePosition');
+        const mousePointUp = document.getElementById('mousePointUp');
+        const mousePointDown = document.getElementById('mousePointDown');
+        const mousePointLeft = document.getElementById('mousePointLeft');
+        const mousePointRight = document.getElementById('mousePointRight');
+        
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+            
+            // Center point
+            mousePosition.style.left = x + 'px';
+            mousePosition.style.top = y + 'px';
+            mousePosition.textContent = ``;
+            
+            // Up point
+            mousePointUp.style.left = x + 'px';
+            mousePointUp.style.top = (y - 25) + 'px';
+            mousePointUp.textContent = ``;
+            
+            // Text for up point
+            const upText = document.createElement('span');
+            upText.textContent = `(${x}, ${y - 25})`;
+            upText.style.position = 'absolute';
+            upText.style.top = '-20px';
+            upText.style.left = '50%';
+            upText.style.transform = 'translateX(-50%)';
+            mousePointUp.appendChild(upText);
+            
+            // Down point
+            mousePointDown.style.left = x + 'px';
+            mousePointDown.style.top = (y + 25) + 'px';
+            mousePointDown.textContent = ``;
+            
+            // Text for down point
+            const downText = document.createElement('span');
+            downText.textContent = `(${x}, ${y + 25})`;
+            downText.style.position = 'absolute';
+            downText.style.top = '20px';
+            downText.style.left = '50%';
+            downText.style.transform = 'translateX(-50%)';
+            mousePointDown.appendChild(downText);
+            
+            // Left point
+            mousePointLeft.style.left = (x - 25) + 'px';
+            mousePointLeft.style.top = y + 'px';
+            mousePointLeft.textContent = ``;
+            
+            // Text for left point
+            const leftText = document.createElement('span');
+            leftText.textContent = `(${x - 25}, ${y})`;
+            leftText.style.position = 'absolute';
+            leftText.style.right = '20px';
+            leftText.style.top = '50%';
+            leftText.style.transform = 'translateY(-50%)';
+            mousePointLeft.appendChild(leftText);
+            
+            // Right point
+            mousePointRight.style.left = (x + 25) + 'px';
+            mousePointRight.style.top = y + 'px';
+            mousePointRight.textContent = ``;
+            
+            // Text for right point
+            const rightText = document.createElement('span');
+            rightText.textContent = `(${x + 25}, ${y})`;
+            rightText.style.position = 'absolute';
+            rightText.style.left = '20px';
+            rightText.style.top = '50%';
+            rightText.style.transform = 'translateY(-50%)';
+            mousePointRight.appendChild(rightText);
+        });
+
+        // Add resize handler to update grid coordinates
+        window.addEventListener('resize', addGridCoordinates);
+
+        // Initial grid setup
+        addGridCoordinates();
+
+        // Modified Civilization game setup
+        Dos(document.getElementById("jsdos"), {
+            wdosboxUrl: "https://js-dos.com/6.22/current/wdosbox.js"
+        }).ready((fs, main) => {
+            fs.createFile("dosbox.conf", `
+                [sdl]
+                autolock=false
+                sensitivity=100
+                waitonerror=true
+                
+                [dosbox]
+                captures=capture
+                machine=svga_s3
+            `);
+
+            // Create a ci instance to handle mouse capture
+            fs.extract("roms/civ.zip").then(() => {
+                const ci = main(["-conf", "dosbox.conf", "-c", "cd civ1", "-c", "CIV.EXE"]);
+                
+                // Add F10 handler for toggling mouse capture
+                let isLocked = false;
+                document.addEventListener('keydown', (e) => {
+                    if (e.code === 'F10') {
+                        isLocked = !isLocked;
+                        ci.simulateKeyPress(0x3B); // F1 key to toggle mouse in DOSBox
+                        if (isLocked) {
+                            document.body.requestPointerLock();
+                        } else {
+                            document.exitPointerLock();
+                        }
+                    }
+                });
+
+                // Handle pointer lock change
+                document.addEventListener('pointerlockchange', () => {
+                    isLocked = !!document.pointerLockElement;
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

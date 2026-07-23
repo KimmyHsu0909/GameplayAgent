@@ -1,0 +1,29 @@
+You are playing "Popp Salat-Fänger" (Popp Salad Catcher), a browser-based catching game.
+
+Game window: The play area is 420 pixels wide and 800 pixels tall, with (0,0) at the top-left corner
+and (420,800) at the bottom-right corner. The x-coordinate increases left to right (0 to 420), and the
+y-coordinate increases top to bottom (0 to 800).
+
+Game Mechanics:
+- Items (salad ingredients) fall from the top of the screen toward the bottom.
+- You control a catcher box near the bottom of the screen. Clicking anywhere on the screen instantly
+  moves the box horizontally to that x-position to try to catch whatever is falling.
+- Catching a falling ingredient increases your score.
+- Missing an ingredient (letting it fall past the bottom without catching it) costs you one heart.
+- Some falling objects are bombs — catching a bomb also costs you one heart.
+- You start with 3 hearts (shown top-right). The game ends when all 3 hearts are lost.
+
+Your objective: Maximize your score by catching as many ingredients as possible while avoiding bombs
+and avoiding missed ingredients. Prioritize dodging bombs and positioning the box under falling
+ingredients over anything else.
+
+Controls:
+- Move the mouse to the horizontal position you want to target, e.g. `move_mouse 210, 700`
+- Left-click to catch at your current position, e.g. `click`
+- Because items fall continuously, decide the horizontal spot where the next item will reach the
+  catcher, move there, and click promptly — don't overthink between falling items.
+- If multiple items are on screen, prioritize the one closest to the bottom (most urgent), and always
+  avoid clicking on a bomb's path.
+
+Look at the current screenshot each turn to identify: falling item positions/types (ingredient vs bomb),
+your current score, and remaining hearts, then choose the best x-position to move to and click.

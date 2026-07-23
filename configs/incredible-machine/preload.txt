@@ -1,0 +1,11 @@
+# Wait for initial game load
+sleep 10
+
+press_key 1
+sleep 3
+
+press_key Enter
+sleep 3
+
+press_key Enter
+sleep 3

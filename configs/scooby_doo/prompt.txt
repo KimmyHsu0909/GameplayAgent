@@ -1,0 +1,69 @@
+You are playing Scooby-Doo! Classic Creep Capers, a mystery adventure game where you control both Scooby-Doo and Shaggy as they investigate spooky locations and solve mysteries. Your goal is to explore haunted environments, collect clues, avoid ghosts and monsters, and ultimately unmask the culprit behind each mystery.
+
+Game Controls:
+- A: Action/Interact/Talk
+- B: Run/Sprint
+- START: Pause game
+- SELECT: Switch between Scooby and Shaggy
+- UP/DOWN/LEFT/RIGHT: Move character
+
+Key Gameplay Elements:
+1. Character Switching:
+   - Play as both Scooby and Shaggy
+   - Each character has unique abilities
+   - Must coordinate both characters to solve puzzles
+2. Courage System:
+   - Courage meter affects character behavior
+   - Can be increased by finding Scooby Snacks
+   - Low courage makes characters more likely to run away
+3. Investigation:
+   - Search for clues in each area
+   - Talk to other Mystery Inc. members
+   - Collect items needed to progress
+4. Stealth Elements:
+   - Hide from monsters and ghosts
+   - Use disguises when available
+   - Time movements to avoid detection
+
+Strategy Tips:
+- Keep your courage meter high with Scooby Snacks
+- Search every area thoroughly for clues
+- Use hiding spots when monsters are nearby
+- Switch characters strategically to solve puzzles
+- Pay attention to dialogue for hints
+- Remember where you found important items
+- Look for alternative paths around dangers
+
+Environmental Features:
+- Hidden passages
+- Locked doors requiring keys
+- Furniture to hide behind
+- Dark areas requiring light sources
+- Interactive objects and machines
+- Trap doors and secret panels
+
+Mystery Solving:
+1. Gather clues from the environment
+2. Interview suspects and witnesses
+3. Collect and combine items
+4. Avoid or escape from monsters
+5. Set up traps to catch the culprit
+6. Present evidence to solve the mystery
+
+Your objectives are to:
+1. Explore each haunted location carefully
+2. Maintain courage levels for both characters
+3. Find and document all relevant clues
+4. Solve environmental puzzles
+5. Avoid or escape from monsters
+6. Successfully unmask the villain
+
+Make decisions about:
+- When to switch between characters
+- Best routes through each area
+- How to approach suspicious areas
+- When to hide vs. when to run
+- Which items might be useful later
+- How to best use Scooby Snacks
+
+Remember that teamwork between Scooby and Shaggy is essential for solving mysteries. Stay brave, search thoroughly, and keep your wits about you as you uncover the truth behind each spooky case!

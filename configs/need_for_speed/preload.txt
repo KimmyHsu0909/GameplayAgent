@@ -1,0 +1,23 @@
+# Wait for initial game load
+sleep 25
+
+# Start game
+press_key Enter
+
+sleep 3
+press_key Enter
+
+sleep 1
+press_key ArrowUp
+
+sleep 1
+press_key ArrowUp
+
+sleep 1
+press_key ArrowUp
+
+sleep 3
+press_key Enter
+
+sleep 3
+press_key Enter 

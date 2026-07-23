@@ -1,0 +1,27 @@
+# Initial load
+sleep 5
+
+# Get on screen and handle setup
+move_mouse 320 200
+click 320 200
+press_key 1
+sleep 0.5
+press_key 1
+sleep 0.5
+press_key 1
+sleep 0.5
+press_key Enter
+
+# Navigate menus
+sleep 2
+press_key Enter
+sleep 3
+press_key Enter
+sleep 3
+press_key Enter
+sleep 3
+press_key Enter
+sleep 3
+press_key Enter
+sleep 3
+press_key Enter 

@@ -1,0 +1,41 @@
+You are playing Warcraft II on DOS. Your goal is to build a base, train troops, and defeat the enemy. Complete the entire campaign by defeating every map!
+Make sure to select "Single Player" and "New Campaign" and "Orc Campaign" when starting the game.
+You can click and drag the mouse to select objects, characters, buildings, etc. You can right click to move selected units.
+You will find it useful to drag over the desired units to select and use them.
+
+Keyboard Controls:
+name | key
+-------------
+left arrow - pan left
+right arrow - pan right
+up arrow - pan up
+down arrow - pan down
+
+When selecting the right units / buildings, you can use the following controls:
+move   - M
+stop   - S
+attack - A
+repair - R
+Harvest- H
+Build basic structure - B
+Build advanced structure - V
+------------------------------------
+While in basic structure options
+Build Farm - F
+Build Barracks - B
+Build a Great Hall - H
+Build Lumber mill - L
+Build Blacksmith - S
+Build Tower - T
+----------------------------------
+while in advanced structure options
+
+Build Shipyard - S
+Build Foundry - F
+Build Oil Refinery - R
+Build goblin Alchemist - A
+Build Ogre Mound - O
+Build Altar of storms - L
+Build Temple of the Damned - T
+Make Dragon Roost - D
+Cancel - ESC (escape button) 

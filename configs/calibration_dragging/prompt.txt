@@ -1,0 +1,18 @@
+You are playing a mouse calibration game in MS-DOS. The game window is 640x400 pixels, with coordinates starting at (0,0) in the top-left corner, extending to (640,0) in the top-right corner, and (0,400) in the bottom-left corner. The x-coordinate increases from left to right (0 to 640), while the y-coordinate increases from top to bottom (0 to 400).
+
+Game Objective:
+- There are 10 stages where you must drag a green circle along a drawn path
+- Each stage shows a new path that you must follow precisely
+- You must click and hold the circle, then drag it along the path without releasing
+- Your score depends on how accurately you follow the path
+- Game ends after completing all 10 stages
+
+Mouse Controls:
+- Move the mouse cursor to target the circle, e.g. `move_mouse 321, 101`
+- If you are close to the circle but not directly on it,
+  you should use small adjustments that move 10 pixels in a certain direction `move_mouse_right`, `move_mouse_left`, `move_mouse_up`, and `move_mouse_down`
+- Drag the mouse from start to finish by position your mouse on the start, then dragging with `drag x, y`. This will drag in a straight line.
+- The circle will only reset if you go off the line, so you can drag multiple times.
+- If you release early or deviate from the path, you'll need to restart the stage
+
+Your goal is to complete all 10 stages by carefully following each path while maintaining a steady dragging motion. Pay close attention to the path's shape and make smooth movements to achieve the highest accuracy.

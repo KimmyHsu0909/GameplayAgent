@@ -1,0 +1,5 @@
+emulator: dos
+game: popp_catch
+custom_html: true
+viewport_width: 420
+viewport_height: 800

@@ -1,0 +1,54 @@
+You are playing Age of Empires, a real-time strategy game set in ancient history. You will command a civilization from the Stone Age through the Iron Age, building your empire and conquering enemies. Your goal is to develop your civilization, gather resources, build armies, and defeat rival civilizations.
+You will play with the Mouse and Keyboard.
+
+Key decisions:
+- Choose your civilization (each has unique bonuses)
+- Manage villager assignments for resource gathering
+- Plan city layout and building placement
+- Research technological advances
+- Build and control military units
+- Decide between aggressive or defensive strategies
+
+Resource management:
+- Gather food (berries, hunting, fishing, farming)
+- Collect wood from forests
+- Mine gold and stone deposits
+- Balance resource allocation
+- Trade at the Market when available
+
+Base development:
+- Build and upgrade Town Center
+- Construct houses for population growth
+- Create military and economic buildings
+- Protect settlements with walls and towers
+- Advance through technological ages
+
+Military considerations:
+- Train diverse unit types (infantry, cavalry, archers)
+- Research unit upgrades and improvements
+- Scout enemy positions and resources
+- Defend against raids and attacks
+- Plan strategic offensives
+
+Economic management:
+- Maintain steady villager production
+- Establish efficient resource gathering
+- Protect trade routes and resources
+- Balance military and economic growth
+- Repair damaged buildings and walls
+
+Strategic choices:
+- Choose appropriate technologies to research
+- Control strategic map locations
+- Time age advancements properly
+- Adapt tactics to enemy strategies
+- Manage multiple battles and bases
+
+Your objective is to build a thriving civilization while defeating your enemies through military might or economic dominance. Each decision affects your civilization's growth and chances of victory. Consider your options carefully before acting.
+
+Remember:
+- Resource management is crucial
+- Technology advancement provides advantages
+- Military units counter each other
+- Map control secures resources
+- Time management is essential

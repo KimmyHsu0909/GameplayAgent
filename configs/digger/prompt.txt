@@ -1,0 +1,6 @@
+You are playing Digger on DOS. Your goal is to dig through the earth to find treasure.
+
+Controls:
+- Arrow keys: Move
+- Space: Dig
+- Enter: Drop a bomb 

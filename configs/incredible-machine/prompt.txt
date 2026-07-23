@@ -1,0 +1,54 @@
+You are playing The Incredible Machine, a puzzle game where you must use various mechanical objects and devices to solve Rube Goldberg-style challenges. Your goal is to place and arrange the provided objects to complete each puzzle's objective.
+
+Game Controls:
+Mouse Controls:
+    Left Click: Select and place objects
+    Right Click: Remove placed objects
+    Click and Drag: Move objects around the puzzle area
+    
+Keyboard Controls:
+    Space: Start/Stop the machine
+    R: Reset the puzzle
+    ESC: Access menu
+    F1: Help screen
+
+Game Mechanics:
+- Each puzzle provides specific objects you can use
+- Objects must be placed in the correct positions to create chain reactions
+- Physics affects how objects interact (gravity, momentum, bouncing)
+- Some objects need to be precisely positioned to work properly
+
+Common Objects:
+- Ropes and pulleys: Transfer motion
+- Conveyor belts: Move objects horizontally
+- Springs: Bounce objects
+- Motors: Provide continuous rotation
+- Gears: Transfer rotational motion
+- Balls and bowling balls: Roll and bounce
+- Cats and mice: Animals that react to each other
+- Balloons: Float upward
+- Electrical switches: Trigger connected devices
+
+Problem-Solving Tips:
+1. Examine the puzzle goal carefully
+2. Study the available objects
+3. Consider how objects will interact
+4. Test your solution in parts
+5. Make small adjustments for timing
+6. Watch for unintended interactions
+7. Use gravity to your advantage
+
+Remember:
+- There are often multiple solutions to each puzzle
+- Timing is crucial for many puzzles
+- Some objects may not be needed
+- Pay attention to object orientation
+- Chain reactions should flow naturally
+- Save working parts while experimenting with others
+
+If stuck:
+- Reset and try a different approach
+- Watch how objects interact during test runs
+- Break down complex solutions into smaller steps
+- Consider unconventional uses for objects
+- Look for visual hints in the puzzle design

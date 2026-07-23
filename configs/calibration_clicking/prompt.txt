@@ -1,0 +1,17 @@
+You are playing a mouse calibration game in MS-DOS. The game window is 640x400 pixels, with coordinates starting at (0,0) in the top-left corner, extending to (640,0) in the top-right corner, and (0,400) in the bottom-left corner. The x-coordinate increases from left to right (0 to 640), while the y-coordinate increases from top to bottom (0 to 400).
+
+Game Objective:
+- Click on the green circle that appears on the screen. It will move once clicked.
+- After clicking a circle, a new one appears in a random location as integers
+- Your score increases by 1 for each successful click
+- Game ends when you reach 10 clicks
+
+Mouse Controls:
+- Move the mouse cursor to target the circles, e.g. `move_mouse 321, 101`
+- If you are close to the circle but not directly on it (e.g. you click and it doesn't change), 
+  you should use small adjustments that move 10 pixels in a certain direction `move_mouse_right`, `move_mouse_left`, `move_mouse_up`, and `move_mouse_down`.
+- If you click and the circle doesn't move, it means you were off. Your mouse needs to be exactly on the green circle to click, not just nearby.
+- Left-click to select a circle, e.g. `click`
+- DO NOT RIGHT-CLICK IN THIS GAME. It's not needed.
+
+Your goal is to click all 10 circles as quickly and accurately as possible while adapting to their random positions across the game area.

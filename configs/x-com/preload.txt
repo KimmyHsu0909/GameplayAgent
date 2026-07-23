@@ -1,0 +1,2 @@
+# Wait for initial game load
+sleep 10

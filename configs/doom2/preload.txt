@@ -1,0 +1,18 @@
+# Wait for initial game load
+sleep 15
+click 320 200
+
+# Get on screen
+move_mouse 320 200
+click 320 200
+sleep 1
+press_key Enter
+
+# Start game
+sleep 10
+press_key Enter
+
+# New campaign
+sleep 2
+press_key Enter
+sleep 1

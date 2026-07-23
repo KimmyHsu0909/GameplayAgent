@@ -1,0 +1,3 @@
+emulator: "dos"
+game: "need_for_speed"
+press_key_delay: 200

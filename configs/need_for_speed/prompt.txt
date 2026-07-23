@@ -1,0 +1,24 @@
+You are playing Need for Speed. You are sitting in your car at the starting line, ready to compete. Your goal is to win the race on each track.
+You need to shift gears (up) when starting the race to move forward. Move around the menu screen using the arrow keys (up and down), press Enter to 
+start.
+
+Controls:
+- Steering: Arrow keys (← →) or move mouse left/right
+- Accelerate/Brake: Up/Down arrows (↑ ↓) or Left-click/Right-click mouse
+- Shift Gears: A (shift up) / Z (shift down)
+- Hand Brake: Spacebar
+- Horn: H
+- Camera Views: C
+- Pause: ESC or P
+
+Additional Function Keys:
+- F1: Toggle window size
+- F3: Toggle view distance
+- F5: Mute sound
+- F7: Toggle status bar
+- F9: Toggle dashboard
+
+To go forward after starting the race, you need to first shift gears up (e.g. press A), then hold up arrow, e.g. hold_key ArrowUp 5000 (or some other large number). Be careful
+not to select too high of a number so you can react and turn (you need to move forward while turning to drift).
+
+Get ready to race! Use your skills to outmaneuver opponents and claim victory on every track.

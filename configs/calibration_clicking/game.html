@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            position: relative;
+        }
+
+        .grid-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .grid-point {
+            position: absolute;
+            font-size: 8px;
+            color: rgba(255, 0, 0, 0.7);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .grid-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image:
+                /* 25px grid lines (lighter) */
+                linear-gradient(to right, rgba(255, 0, 0, 0.096) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 0, 0, 0.096) 1px, transparent 1px),
+                /* 50px grid lines (darker) */
+                linear-gradient(to right, rgba(255, 0, 0, 0.375) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 0, 0, 0.375) 1px, transparent 1px);
+            background-size: 25px 25px, 25px 25px, 50px 50px, 50px 50px;
+            pointer-events: none;
+            z-index: 11;
+        }
+
+        #mousePosition, .mousePoint {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            font-size: 14px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transform: translate(-10px, -5px);
+            white-space: nowrap;
+            background: rgba(0, 0, 128, 0.246); /* More transparent blue */
+            padding: 2px 6px;
+            border-radius: 4px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        }
+
+        #mousePosition.mouse-icon-only {
+            background: none;
+            color: #222;
+            font-size: 22px;
+            padding: 0;
+            box-shadow: none;
+        }
+        #mousePosition.mouse-icon-only::before {
+            content: '';
+            margin: 0;
+        }
+        #mousePosition.mouse-icon-only::after {
+            content: '🖱️';
+            font-size: 22px;
+            margin: 0;
+        }
+
+        .mousePoint { display: none; } /* Hide the up/down/left/right points */
+
+        #gameArea {
+            width: 640px;
+            height: 400px;
+            border: 3px solid rgba(51, 51, 51, 0.2);  /* Making border semi-transparent */
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: transparent;  /* Making background transparent */
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        #circle {
+            width: 40px;
+            height: 40px;
+            background-color: green;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+        }
+
+        #winMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: green;
+        }
+
+        #restartButton {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #scoreDisplay {
+            position: fixed;
+            top: 16px;
+            right: 32px;
+            background: rgba(0,0,0,0.15);
+            color: #222;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 6px 18px;
+            border-radius: 8px;
+            z-index: 2000;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            pointer-events: none;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div id="mousePosition" class="hidden"></div>
+    <div id="mousePointUp" class="mousePoint hidden"></div>
+    <div id="mousePointDown" class="mousePoint hidden"></div>
+    <div id="mousePointLeft" class="mousePoint hidden"></div>
+    <div id="mousePointRight" class="mousePoint hidden"></div>
+    <div class="grid-container hidden" id="gridContainer"></div>
+    <div class="grid-lines hidden"></div>
+    <div id="scoreDisplay">Score: 0</div>
+    <div id="gameArea">
+        <div id="circle"></div>
+    </div>
+
+    <div id="winMessage" class="hidden">
+        <button id="restartButton">Play Again?</button>
+    </div>
+
+    <script>
+        const GAME_AREA_WIDTH = 640;
+        const GAME_AREA_HEIGHT = 400;
+        const CIRCLE_DIAMETER = 40;
+        const TARGET_CLICKS = 10;
+
+        const gameArea = document.getElementById('gameArea');
+        const circle = document.getElementById('circle');
+        const winMessage = document.getElementById('winMessage');
+        const restartButton = document.getElementById('restartButton');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+
+        let currentScore = 0;
+        let gameActive = true;
+
+        function moveCircle() {
+            // Get actual available space
+            const availableWidth = gameArea.clientWidth;
+            const availableHeight = gameArea.clientHeight;
+            
+            // Calculate maximum positions
+            const maxLeft = availableWidth - CIRCLE_DIAMETER;
+            const maxTop = availableHeight - CIRCLE_DIAMETER;
+            
+            // Generate random positions
+            const randomLeft = Math.floor(Math.random() * maxLeft);
+            const randomTop = Math.floor(Math.random() * maxTop);
+            
+            // Apply positions
+            circle.style.left = `${randomLeft}px`;
+            circle.style.top = `${randomTop}px`;
+            
+            console.log(`Circle at ${randomLeft},${randomTop} in space ${availableWidth}x${availableHeight}`);
+            scoreDisplay.textContent = `Score: ${currentScore}`;
+        }
+
+        function handleCircleClick() {
+            if (!gameActive) return;
+
+            currentScore++;
+            scoreDisplay.textContent = `Score: ${currentScore}`;
+
+            if (currentScore >= TARGET_CLICKS) {
+                gameActive = false;
+                circle.classList.add('hidden');
+                winMessage.classList.remove('hidden');
+            } else {
+                moveCircle();
+            }
+        }
+
+        function restartGame() {
+            currentScore = 0;
+            gameActive = true;
+            winMessage.classList.add('hidden');
+            circle.classList.remove('hidden');
+            scoreDisplay.textContent = `Score: ${currentScore}`;
+            moveCircle();
+        }
+
+        circle.addEventListener('click', handleCircleClick);
+        restartButton.addEventListener('click', restartGame);
+        moveCircle();
+
+        // Only activate overlay and mouse tracking if mouse_overlay is true
+        let mouse_overlay = false;
+        // Always show mouse icon at mouse position
+        const mousePosition = document.getElementById('mousePosition');
+        mousePosition.classList.remove('hidden');
+        mousePosition.classList.add('mouse-icon-only');
+
+        // Single mousemove handler
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+            mousePosition.style.left = x + 'px';
+            mousePosition.style.top = y + 'px';
+            
+            if (mouse_overlay) {
+                // Show detailed position with coordinates
+                mousePosition.classList.remove('mouse-icon-only');
+                mousePosition.textContent = `(${x},${y})`;
+            } else {
+                // Show simple mouse icon
+                mousePosition.classList.add('mouse-icon-only');
+                mousePosition.textContent = '';
+            }
+        });
+
+        if (mouse_overlay === true) {
+            // Show overlay elements
+            mousePosition.classList.remove('mouse-icon-only');
+            // Hide the up/down/left/right points
+            document.getElementById('mousePointUp').classList.add('hidden');
+            document.getElementById('mousePointDown').classList.add('hidden');
+            document.getElementById('mousePointLeft').classList.add('hidden');
+            document.getElementById('mousePointRight').classList.add('hidden');
+            document.getElementById('gridContainer').classList.remove('hidden');
+            document.querySelector('.grid-lines').classList.remove('hidden');
+
+            // Add grid coordinates
+            function addGridCoordinates() {
+                const container = document.getElementById('gridContainer');
+                container.innerHTML = ''; // Clear previous points
+
+                const gridSpacing = 50;
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+
+                for (let x = 0; x <= viewportWidth; x += gridSpacing) {
+                    for (let y = 0; y <= viewportHeight; y += gridSpacing) {
+                        const point = document.createElement('div');
+                        point.className = 'grid-point';
+                        point.style.left = x + 'px';
+                        point.style.top = y + 'px';
+                        point.style.fontSize = '10px';
+                        point.textContent = `(${x},${y})`;
+                        container.appendChild(point);
+                    }
+                }
+            }
+
+            // Add resize handler to update grid coordinates
+            window.addEventListener('resize', () => {
+                const container = document.getElementById('gridContainer');
+                container.innerHTML = '';
+                addGridCoordinates();
+            });
+
+            // Initial grid setup
+            addGridCoordinates();
+        }
+    </script>
+</body>
+</html>

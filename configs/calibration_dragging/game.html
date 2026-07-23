@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Follow the Path Game</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            touch-action: none; /* Prevent scrolling on touch devices */
+        }
+        #game-container {
+            position: relative;
+            border: 2px solid #555;
+            background-color: #fff;
+            /* Make canvas responsive, but paths have fixed coordinates */
+            /* Adjust width/height here and potentially scale coordinates if needed */
+            width: 90%;
+            max-width: 600px;
+            aspect-ratio: 4 / 3; /* Maintain a consistent aspect ratio */
+            cursor: pointer; /* Indicate it's interactive */
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        #game-info {
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.2em;
+            color: #333;
+        }
+        #message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            font-size: 1.5em;
+            text-align: center;
+            display: none; /* Hidden by default */
+            z-index: 10;
+        }
+        #mouseIndicator {
+            position: fixed;
+            font-size: 22px;
+            pointer-events: none;
+            z-index: 1000;
+            transform: translate(-50%, -50%); /* Center the emoji on cursor */
+        }
+    </style>
+</head>
+<body>
+    <div id="mouseIndicator">🖱️</div>
+
+    <div id="game-info">
+        Level: <span id="level-display">1</span> | Drag the red dot along the path!
+    </div>
+
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div id="message">Level Complete!</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameContainer = document.getElementById('game-container');
+        const levelDisplay = document.getElementById('level-display');
+        const messageDiv = document.getElementById('message');
+        const mouseIndicator = document.getElementById('mouseIndicator');
+
+        // --- Game Configuration ---
+        const dotRadius = 15;
+        const pathWidth = 12; // << INCREASED PATH WIDTH
+        const pathColor = '#000000';
+        const dotColor = '#FF0000';
+        const startColor = '#008000'; // Green
+        const endColor = '#008000';   // Green
+        const endpointRadius = pathWidth * 0.8; // Make endpoint slightly larger than half path width
+        const checkTolerance = pathWidth / 2 + dotRadius * 0.8; // How far off the path is allowed (center of dot can go slightly past path edge)
+        const endProximity = dotRadius * 1.5; // How close to the end point to win
+
+        let currentLevel = 0;
+        let dotPos = { x: 0, y: 0 };
+        let isDragging = false;
+        let levels = [];
+        let scaleX = 1;
+        let scaleY = 1;
+
+        // --- Level Definitions ---
+        // Paths are arrays of {x, y} points. Coordinates are based on a nominal 600x450 canvas.
+        // They will be scaled if the canvas size differs.
+        const nominalWidth = 600;
+        const nominalHeight = 450;
+
+        levels = [
+            // Level 1: Straight Line
+            { path: [{ x: 50, y: 225 }, { x: 550, y: 225 }] },
+            // Level 2: Simple Curve Down
+            { path: [{ x: 50, y: 100 }, { x: 250, y: 250 }, { x: 550, y: 330 }] },
+            // Level 3: Simple Curve Up
+            { path: [{ x: 50, y: 350 }, { x: 350, y: 150 }, { x: 450, y: 125 }, { x: 550, y: 120 }] },
+            // Level 4: S Curve
+            { path: [{ x: 50, y: 100 }, { x: 150, y: 200 }, { x: 250, y: 100 }, { x: 350, y: 200 }, { x: 450, y: 300 }, { x: 550, y: 350 }] },
+            // Level 5: Square Shape (Modified Endpoint)
+            { path: [{ x: 100, y: 100 }, { x: 500, y: 100 }, { x: 500, y: 350 }, { x: 100, y: 350 }, { x: 100, y: 150 }, { x: 150, y: 150 }] }, // << MODIFIED: Endpoint is now {x: 150, y: 150}
+            // Level 6: Loop (Modified Endpoint)
+            { path: [{ x: 300, y: 100 }, { x: 450, y: 150 }, { x: 500, y: 225 }, { x: 450, y: 300 }, { x: 300, y: 350 }, { x: 150, y: 300 }, { x: 100, y: 225 }, { x: 150, y: 150 }, { x: 250, y: 125 }] }, // << MODIFIED: Endpoint is now {x: 250, y: 125}
+             // Level 7: Zig Zag
+            { path: [{ x: 50, y: 100 }, { x: 150, y: 200 }, { x: 50, y: 300 }, { x: 150, y: 400 }, { x: 250, y: 100 }, { x: 350, y: 200 }, { x: 250, y: 300 }, {x: 350, y: 400}, {x: 450, y: 200}, {x: 550, y: 100}] },
+            // Level 8: Gentle Wave
+            { path: [{ x: 50, y: 200 }, { x: 100, y: 150 }, { x: 150, y: 130 }, { x: 200, y: 150 }, { x: 250, y: 200 }, { x: 300, y: 250 }, { x: 350, y: 270 }, { x: 400, y: 250 }, { x: 450, y: 200 }, { x: 500, y: 150 }, { x: 550, y: 130 }] },
+            // Level 9: Spiral Inwards (Approx)
+            { path: [ {x: 300, y: 50}, {x: 450, y: 50}, {x: 500, y: 100}, {x: 500, y: 350}, {x: 450, y: 400}, {x: 150, y: 400}, {x: 100, y: 350}, {x: 100, y: 150}, {x: 150, y: 100}, {x: 350, y: 100}, {x: 400, y: 150}, {x: 400, y: 300}, {x: 350, y: 350}, {x: 200, y: 350}, {x: 150, y: 300}, {x: 150, y: 200}, {x: 200, y: 150}, {x: 300, y: 150 }, {x: 350, y: 200}, {x: 350, y: 250}, {x: 300, y: 300}, {x: 250, y: 300}, {x: 200, y: 250}, {x: 200, y: 200}, {x: 250, y: 180}, {x: 300, y: 225}] }, // Ends near center
+            // Level 10: Complex Path
+            { path: [{ x: 50, y: 400 }, { x: 100, y: 100 }, { x: 150, y: 350 }, { x: 200, y: 50 }, { x: 250, y: 400 }, { x: 300, y: 150 }, { x: 350, y: 300 }, { x: 400, y: 100 }, { x: 450, y: 250 }, { x: 500, y: 50 }, { x: 550, y: 225 }] },
+        ];
+
+        // --- Drawing Functions ---
+
+        function resizeCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = gameContainer.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            scaleX = rect.width / nominalWidth;
+            scaleY = rect.height / nominalHeight;
+
+            if (levels.length > 0) {
+                 drawLevel();
+            }
+        }
+
+        function scaleCoord(coord) {
+            return { x: coord.x * scaleX, y: coord.y * scaleY };
+        }
+
+        function drawPath(level) {
+            if (!level || !level.path || level.path.length < 2) return;
+
+            const scaledPath = level.path.map(scaleCoord);
+
+            ctx.strokeStyle = pathColor;
+            ctx.lineWidth = pathWidth; // Uses the updated thicker width
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            ctx.beginPath();
+            ctx.moveTo(scaledPath[0].x, scaledPath[0].y);
+            for (let i = 1; i < scaledPath.length; i++) {
+                ctx.lineTo(scaledPath[i].x, scaledPath[i].y);
+            }
+            ctx.stroke();
+
+            // Draw Start Point
+            ctx.fillStyle = startColor;
+            ctx.beginPath();
+            ctx.arc(scaledPath[0].x, scaledPath[0].y, endpointRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw End Point
+            const endPoint = scaledPath[scaledPath.length - 1];
+            ctx.fillStyle = endColor;
+            ctx.beginPath();
+            ctx.arc(endPoint.x, endPoint.y, endpointRadius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawDot() {
+            ctx.fillStyle = dotColor;
+            ctx.beginPath();
+            ctx.arc(dotPos.x, dotPos.y, dotRadius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawLevel() {
+            const logicalWidth = canvas.width / (window.devicePixelRatio || 1);
+            const logicalHeight = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, logicalWidth, logicalHeight);
+
+            const level = levels[currentLevel];
+            if (level) {
+                drawPath(level);
+                drawDot();
+            } else {
+                console.log("No more levels or level data missing!");
+            }
+        }
+
+        // --- Game Logic ---
+
+        function showMessage(text, duration = 1500) {
+            messageDiv.textContent = text;
+            messageDiv.style.display = 'block';
+            if (duration > 0) {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, duration);
+            }
+        }
+
+        function loadLevel(levelIndex) {
+            if (levelIndex >= levels.length) {
+                showMessage("Congratulations! You finished all levels!", -1);
+                isDragging = false;
+                return;
+            }
+            currentLevel = levelIndex;
+            const level = levels[currentLevel];
+            const startPoint = scaleCoord(level.path[0]);
+            dotPos = { x: startPoint.x, y: startPoint.y };
+            levelDisplay.textContent = currentLevel + 1;
+            isDragging = false;
+            resizeCanvas(); // Recalculate scales and draw
+        }
+
+        function resetDot() {
+            const level = levels[currentLevel];
+            if (!level) return;
+            const startPoint = scaleCoord(level.path[0]);
+            dotPos = { x: startPoint.x, y: startPoint.y };
+            isDragging = false; // Stop dragging on reset
+            drawLevel();
+             // Add a little visual feedback for resetting (optional)
+            gameContainer.style.backgroundColor = '#ffdddd'; // Flash light red
+            setTimeout(() => { gameContainer.style.backgroundColor = '#fff'; }, 200);
+        }
+
+        // --- Collision Detection ---
+        function distToSegmentSquared(p, a, b) {
+            const l2 = (b.x - a.x) ** 2 + (b.y - a.y) ** 2;
+            if (l2 === 0) return (p.x - a.x) ** 2 + (p.y - a.y) ** 2;
+            let t = ((p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y)) / l2;
+            t = Math.max(0, Math.min(1, t));
+            const projection = { x: a.x + t * (b.x - a.x), y: a.y + t * (b.y - a.y) };
+            return (p.x - projection.x) ** 2 + (p.y - projection.y) ** 2;
+        }
+
+        function isDotOnPath(level, currentDotPos) {
+            if (!level || !level.path || level.path.length < 2) return false;
+            const scaledPath = level.path.map(scaleCoord);
+            const toleranceSq = checkTolerance ** 2;
+
+            for (let i = 0; i < scaledPath.length - 1; i++) {
+                if (distToSegmentSquared(currentDotPos, scaledPath[i], scaledPath[i + 1]) <= toleranceSq) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function checkWinCondition(level, currentDotPos) {
+             if (!level || !level.path || level.path.length < 1) return false;
+             const endPoint = scaleCoord(level.path[level.path.length - 1]);
+             const dx = currentDotPos.x - endPoint.x;
+             const dy = currentDotPos.y - endPoint.y;
+             return (dx * dx + dy * dy) < (endProximity ** 2);
+        }
+
+        // --- Event Handlers ---
+        function getRelativePos(clientX, clientY) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleRatioX = canvas.width / (window.devicePixelRatio || 1) / rect.width;
+            const scaleRatioY = canvas.height / (window.devicePixelRatio || 1) / rect.height;
+             return {
+                 x: (clientX - rect.left) * scaleRatioX,
+                 y: (clientY - rect.top) * scaleRatioY
+             };
+        }
+
+        function handleStart(clientX, clientY) {
+            const pos = getRelativePos(clientX, clientY);
+            if (!pos) return;
+
+            const dx = pos.x - dotPos.x;
+            const dy = pos.y - dotPos.y;
+            // Only start dragging if click/touch is ON the dot
+            if (dx * dx + dy * dy < dotRadius ** 2) {
+                isDragging = true;
+                 // Move dot exactly to cursor start point only if starting ON the dot
+                 // This prevents snapping from afar if the tolerance was larger
+                 dotPos = pos;
+                 drawLevel(); // Update visual immediately
+            } else {
+                 // Optional: Check if click is near the *start* point of the path
+                 const level = levels[currentLevel];
+                 if (level) {
+                    const startPoint = scaleCoord(level.path[0]);
+                    const startDx = pos.x - startPoint.x;
+                    const startDy = pos.y - startPoint.y;
+                    // Allow starting if clicking near the green start circle too
+                    if (startDx * startDx + startDy * startDy < (endpointRadius * 1.5)**2) {
+                        isDragging = true;
+                        dotPos = startPoint; // Snap to start
+                        drawLevel();
+                    } else {
+                         isDragging = false;
+                    }
+                 } else {
+                    isDragging = false;
+                 }
+            }
+        }
+
+
+        function handleMove(clientX, clientY) {
+             if (!isDragging) return;
+             const pos = getRelativePos(clientX, clientY);
+             if (!pos) return;
+
+             const level = levels[currentLevel];
+             if (!level) return;
+
+             // Check if the *new* position is on the path
+             if (isDotOnPath(level, pos)) {
+                 dotPos = pos; // Update dot position
+                 drawLevel(); // Redraw
+
+                 // Check for win condition
+                 if (checkWinCondition(level, dotPos)) {
+                     isDragging = false;
+                     showMessage("Level Complete!");
+                     setTimeout(() => {
+                         loadLevel(currentLevel + 1);
+                     }, 1500); // Wait a bit before loading next level
+                 }
+             } else {
+                 // Off the path - reset!
+                 resetDot();
+             }
+         }
+
+        function handleEnd() {
+             // Only action needed is to stop dragging state.
+             // Position is only updated in handleMove if valid.
+             // If the last valid position was on the path, it stays there.
+             // If the last move went off path, resetDot() was already called in handleMove.
+             isDragging = false;
+         }
+
+        // Mouse Events
+        canvas.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            handleStart(e.clientX, e.clientY);
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            e.preventDefault();
+            handleMove(e.clientX, e.clientY);
+            const x = e.clientX;
+            const y = e.clientY;
+            mouseIndicator.style.left = x + 'px';
+            mouseIndicator.style.top = y + 'px';
+        });
+
+        canvas.addEventListener('mouseup', (e) => {
+            e.preventDefault();
+            handleEnd();
+        });
+
+        canvas.addEventListener('mouseleave', (e) => {
+            if (isDragging) {
+                resetDot(); // Reset if mouse leaves canvas while dragging
+            }
+        });
+
+        // Touch Events
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+             if (e.touches.length > 0) {
+                handleStart(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (e.touches.length > 0) {
+                handleMove(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        });
+
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            handleEnd();
+        });
+         canvas.addEventListener('touchcancel', (e) => {
+             e.preventDefault();
+             resetDot(); // Treat cancel like leaving the area
+         });
+
+        // Window Resize Event
+        window.addEventListener('resize', resizeCanvas);
+
+        // --- Initialization ---
+        loadLevel(0); // Start game at level 1 (index 0)
+
+    </script>
+
+</body>
+</html>

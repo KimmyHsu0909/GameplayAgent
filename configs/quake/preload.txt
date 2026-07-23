@@ -1,0 +1,23 @@
+# Wait for initial game load
+sleep 12
+
+# Get on screen
+move_mouse 320 200
+click 320 200
+
+# Start game
+sleep 3
+press_key 1
+
+sleep 3
+press_key Enter
+
+sleep 3
+press_key Enter
+
+# Orc campaign
+sleep 3
+press_key Enter
+
+sleep 4
+press_key Enter 

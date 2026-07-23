@@ -18,6 +18,7 @@ For each step, you should:
    - write text: Type the specified text
    - press_key key: Press a specific key or key combination
    - hold_key key[,duration]: Hold a key down for a specific duration (default 0.5 seconds)
+   - wait [seconds]: Send no input and wait for the game to advance (default 0.5 seconds, maximum 5 seconds)
 3. Observation: You will receive the result of your action
 
 You will interact with the game via the keyboard and mouse actions.

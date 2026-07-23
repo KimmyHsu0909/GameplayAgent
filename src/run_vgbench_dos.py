@@ -102,7 +102,8 @@ async def run_dos_emulator(args):
         enable_ui=args.enable_ui,
         task_prompt=args.task_prompt,
         press_key_delay=args.press_key_delay,
-        api_base=args.api_base
+        api_base=args.api_base,
+        request_timeout=args.request_timeout,
     )
 
     game_interface = DOSGameInterface(
@@ -123,4 +124,3 @@ async def run_dos_emulator(args):
 
     await evaluator.start(url)
     await evaluator.run_episode(agent, task, server)
-    

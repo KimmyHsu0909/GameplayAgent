@@ -310,7 +310,7 @@ class AgentMonitorUI:
             height = self.root.winfo_height()
             
             screenshot = ImageGrab.grab(bbox=(x, y, x+width, y+height))
-            screenshot.save(f"{path}/{name}")
+            screenshot.convert("RGB").save(f"{path}/{name}", format="JPEG")
         except Exception as e:
             print(f"Error taking screenshot: {e}")
 

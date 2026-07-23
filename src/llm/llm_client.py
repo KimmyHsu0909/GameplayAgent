@@ -30,7 +30,8 @@ class LLMClient:
         max_tokens: int = 1024,
         max_cost: float = 30.0,  # Maximum cost in USD
         log_dir: Optional[Path] = None,
-        api_base: Optional[str] = None # For Ollama
+        api_base: Optional[str] = None,  # For Ollama or compatible providers
+        request_timeout: float = 300.0,
     ):
         """
         Initialize the LLM client.
@@ -43,6 +44,7 @@ class LLMClient:
             max_cost: The maximum cost in USD for the current session
             log_dir: Optional custom log directory path
             api_base: Optional API base URL for Ollama or other providers
+            request_timeout: Maximum time in seconds to wait for one model request
         """
         self.model = model
         self.api_key = api_key
@@ -51,6 +53,7 @@ class LLMClient:
         self.max_cost = max_cost
         self.total_cost = 0.0
         self.api_base = api_base
+        self.request_timeout = request_timeout
         
         # Set up logging directory
         if log_dir is None:
@@ -77,12 +80,9 @@ class LLMClient:
             if not model.startswith("anthropic/"):
                 self.model = f"anthropic/{model}"
             self.provider = "anthropic"
-        elif self.api_base and "ollama" in self.api_base:
+        elif model.lower().startswith("ollama/"):
             # Configure for Ollama
             self.provider = "ollama"
-            if not model.startswith("ollama/"):
-                self.model = f"ollama/{model}"
-            litellm.api_base = self.api_base
         else:
             # For other models, set a generic API key
             litellm.api_key = api_key
@@ -216,11 +216,18 @@ class LLMClient:
             if self.model != "together_ai/meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8":
                 messages = litellm.utils.trim_messages(messages, self.model, trim_ratio=1)
 
+            completion_args = {
+                "model": self.model,
+                "messages": messages,
+                "temperature": self.temperature,
+                "max_tokens": self.max_tokens,
+                "timeout": self.request_timeout,
+            }
+            if self.api_base:
+                completion_args["api_base"] = self.api_base
+
             response = await litellm.acompletion(
-                model=self.model,
-                messages=messages,
-                temperature=self.temperature,
-                max_tokens=self.max_tokens,
+                **completion_args
             )
             response_time = time.time() - start_time
             

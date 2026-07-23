@@ -51,8 +51,8 @@ def parse_args():
                        help="Run the emulator without visual display")
     parser.add_argument("--config-folder", type=str, default="configs/",
                        help="Path to the config folder")
-    parser.add_argument("--max-tokens", type=int, default=1024, 
-                       help="The maximum number of tokens to generate")
+    parser.add_argument("--max-tokens", type=int, default=256,
+                       help="The maximum number of tokens to generate. Default is 256.")
     parser.add_argument("--temperature", type=float, default=0.7, 
                        help="The temperature for LLM generation")
     parser.add_argument("--num-screenshots-per-action", type=int, default=0, 
@@ -65,6 +65,8 @@ def parse_args():
                        help="API key for the chosen LLM provider")
     parser.add_argument("--api-base", type=str, default=None,
                        help="API base URL for Ollama or other providers")
+    parser.add_argument("--request-timeout", type=float, default=300.0,
+                       help="Timeout in seconds for each LLM request. Default is 300.")
 
     # DOS-specific arguments
     parser.add_argument("--port", type=int, default=8000, 

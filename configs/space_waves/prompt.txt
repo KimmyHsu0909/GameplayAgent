@@ -7,19 +7,23 @@ Setup:
 - Click only visible targets and always provide coordinates as `x,y`.
 - Never repeatedly click with empty coordinates.
 
+Gameplay:
+- Control the arrow to avoid crashing into a wall, a rotating cog or thorns.
+- Holding the mouse continuously makes the arrow rise. Releasing the mouse makes it fall.
+- Carefully adjust when to press and how long to hold the mouse according to the upcoming spike layout.
+- The objective is to avoid touching any spikes for as long as possible and maximize survival time.
+- When the game start, you don't have to change the x,y in `hold_mouse x,y,duration`, just keep it in the game screen and don't move it.
+
 Tutorial:
 1. The first game session starts in the tutorial. Click anywhere inside the game canvas to focus and begin.
-2. When `hold for 3` or `holf for 3` appears, use `hold_mouse x,y,3.2` inside the game canvas. Keep the mouse button down continuously for the full duration.
-3. Then follow the tutorial text using repeated clicks or holds as instructed.
-4. When the tutorial ends and the title `Select a Game Mode` appears, choose `Start` under `Classic`.
+2. When `hold for 3` or `holf for 3` appears, just hold the mouse more than 3 seconds. 
+3. When `clicks for 9` appears, just clicks 9 times repeatedly.
+4. Then try to avoid crashing your arrow into a wall, a rotating cog or thorns, you should adjust and control the hold time by yourself.
+4. When the tutorial ends and the title `Select a Game Mode` appears, choose `Start` under `Classic`.Then the game really starts.
 
 Input timing:
 - Every mouse click or mouse hold must last at least 1 second. There is no maximum duration.
 - Use mouse actions only. Never use Space, W, P, `press_key`, `hold_key`, or any other keyboard input.
 - Never use short taps. Use `hold_mouse x,y,duration` for all gameplay input.
+- duration of `hold_mouse x,y,duration` is important, adjust it if the arrow crashes into a wall, a rotating cog or thorns
 
-Gameplay:
-- Control the arrow to avoid the spikes along the top and bottom of the game area.
-- Holding the mouse continuously makes the arrow rise. Releasing the mouse makes it fall.
-- Carefully adjust when to press and how long to hold the mouse according to the upcoming spike layout.
-- The objective is to avoid touching any spikes for as long as possible and maximize survival time.

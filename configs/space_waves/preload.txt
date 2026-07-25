@@ -1,2 +1,12 @@
-# Wait for CrazyGames and the Unity game to load.
-sleep 15
+# Wait for the CrazyGames page, consent UI, and Unity canvas to load.
+sleep 8
+
+# Put the cursor near the middle of the 1280x720 viewport without clicking.
+# Consent prompts are conditional, so the vision agent must handle them.
+move_mouse 640 360
+
+# Expected agent-controlled sequence:
+# 1. If present, click "Agree & Continue" for at least 1 second.
+# 2. Click inside the tutorial canvas for at least 1 second.
+# 3. When "hold for 3" or "holf for 3" appears, hold_mouse inside the canvas for 3.2 seconds.
+# 4. Follow the tutorial with repeated inputs, each longer than 1 second.

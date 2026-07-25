@@ -114,6 +114,10 @@ async def run_dos_emulator(args):
         viewport_width=getattr(args, "viewport_width", None),
         viewport_height=getattr(args, "viewport_height", None),
         pause_key=getattr(args, "pause_key", None),
+        minimum_input_duration=getattr(args, "minimum_input_duration", 0.0),
+        minimum_mouse_duration=getattr(args, "minimum_mouse_duration", None),
+        minimum_space_duration=getattr(args, "minimum_space_duration", None),
+        mouse_only=getattr(args, "mouse_only", False),
     )
 
     evaluator = DOSEvaluator(

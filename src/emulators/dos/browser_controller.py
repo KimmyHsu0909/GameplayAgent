@@ -74,6 +74,12 @@ class BrowserController:
                     x, y = float(parts[1]), float(parts[2])
                     await self.click(x, y)
                     print(f"Clicked at ({x}, {y})")
+
+                elif command == "hold_mouse":
+                    x, y = float(parts[1]), float(parts[2])
+                    duration = float(parts[3])
+                    await self.hold_mouse(x, y, duration)
+                    print(f"Held mouse at ({x}, {y}) for {duration} seconds")
                     
                 elif command == "press_key":
                     key = parts[1]
@@ -253,6 +259,41 @@ class BrowserController:
             await self.page.mouse.click(x, y)
         
         logger.info(f"Clicked at ({x}, {y}) with options: {options}")
+
+    async def hold_mouse(
+        self,
+        x: float,
+        y: float,
+        duration_seconds: float,
+        button: str = "left",
+        modifiers: Optional[List[str]] = None,
+    ) -> None:
+        """Hold a mouse button at the specified coordinates."""
+        if not self.page:
+            raise ValueError("Browser not started")
+
+        await self.move_mouse(x, y)
+        await asyncio.sleep(random.uniform(0.1, 0.3))
+
+        modifiers = modifiers or []
+        for modifier in modifiers:
+            await self.page.keyboard.down(modifier)
+
+        await self.page.mouse.down(button=button)
+        try:
+            await asyncio.sleep(duration_seconds)
+        finally:
+            await self.page.mouse.up(button=button)
+            for modifier in reversed(modifiers):
+                await self.page.keyboard.up(modifier)
+
+        logger.info(
+            "Held %s mouse button at (%s, %s) for %s seconds",
+            button,
+            x,
+            y,
+            duration_seconds,
+        )
         
     async def drag(self, x: float, y: float) -> None:
         """

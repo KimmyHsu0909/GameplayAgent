@@ -20,6 +20,10 @@ class DOSGameInterface(VideoGameBenchInterface):
                  viewport_width: int = None,
                  viewport_height: int = None,
                  pause_key: str = None,
+                 minimum_input_duration: float = 0.0,
+                 minimum_mouse_duration: float = None,
+                 minimum_space_duration: float = None,
+                 mouse_only: bool = False,
                  ):
         super().__init__()
         self.headless = headless
@@ -31,6 +35,16 @@ class DOSGameInterface(VideoGameBenchInterface):
         self.viewport_width = viewport_width
         self.viewport_height = viewport_height
         self.pause_key = pause_key or "Alt+Pause"
+        legacy_minimum = max(0.0, minimum_input_duration)
+        self.minimum_mouse_duration = max(
+            0.0,
+            legacy_minimum if minimum_mouse_duration is None else minimum_mouse_duration,
+        )
+        self.minimum_space_duration = max(
+            0.0,
+            legacy_minimum if minimum_space_duration is None else minimum_space_duration,
+        )
+        self.mouse_only = mouse_only
 
         # Lite condition, can change
         if lite:
@@ -89,10 +103,34 @@ class DOSGameInterface(VideoGameBenchInterface):
         else:
             click_options = None
         
-        # Click the mouse
-        await self.browser.click(x, y, click_options)
-        result = f"Mouse clicked at ({x}, {y}) with options: {click_options}"
+        if self.minimum_mouse_duration > 0:
+            button = click_options.get("button", "left") if click_options else "left"
+            await self.browser.hold_mouse(
+                x,
+                y,
+                self.minimum_mouse_duration,
+                button=button,
+                modifiers=click_options.get("modifiers", []) if click_options else [],
+            )
+            result = (
+                f"Mouse held at ({x}, {y}) for "
+                f"{self.minimum_mouse_duration} seconds"
+            )
+        else:
+            await self.browser.click(x, y, click_options)
+            result = f"Mouse clicked at ({x}, {y}) with options: {click_options}"
         return result
+
+    async def hold_mouse(self, action_input: str, delay_ms: float = 100) -> str:
+        parts = [part.strip() for part in action_input.split(",")]
+        if len(parts) < 2:
+            raise ValueError("hold_mouse requires x,y[,duration]")
+
+        x, y = float(parts[0]), float(parts[1])
+        requested_duration = float(parts[2]) if len(parts) > 2 else 1.0
+        duration = max(requested_duration, self.minimum_mouse_duration)
+        await self.browser.hold_mouse(x, y, duration)
+        return f"Held mouse at ({x}, {y}) for {duration} seconds"
 
     async def move(self, action_input: str, press_key_delay_ms: float = 0.5) -> str:
         x, y = map(float, action_input.split(","))
@@ -128,13 +166,26 @@ class DOSGameInterface(VideoGameBenchInterface):
         if "," in action_input:
             keys = action_input.split(",")
             for key in keys:
-                await self.browser.press_key(key.strip(), lite_mode=self.lite, delay_ms=press_key_delay_ms)
+                key = key.strip()
+                key_delay_ms = press_key_delay_ms
+                if key.lower() == "space":
+                    key_delay_ms = max(
+                        key_delay_ms,
+                        self.minimum_space_duration * 1000,
+                    )
+                await self.browser.press_key(key, lite_mode=self.lite, delay_ms=key_delay_ms)
                 screenshot = await self.browser.get_screenshot()
                 screenshots.append(screenshot)
-                await asyncio.sleep(press_key_delay_ms / 1000)
+                await asyncio.sleep(key_delay_ms / 1000)
             result = f"Pressed keys: {action_input}"
         else:
-            await self.browser.press_key(action_input, lite_mode=self.lite, delay_ms=press_key_delay_ms)
+            key_delay_ms = press_key_delay_ms
+            if action_input.strip().lower() == "space":
+                key_delay_ms = max(
+                    key_delay_ms,
+                    self.minimum_space_duration * 1000,
+                )
+            await self.browser.press_key(action_input, lite_mode=self.lite, delay_ms=key_delay_ms)
             result = f"Pressed key: {action_input}"
         return result, screenshots
 
@@ -142,6 +193,8 @@ class DOSGameInterface(VideoGameBenchInterface):
         parts = action_input.split(",")
         key = parts[0].strip()
         duration = float(parts[1]) if len(parts) > 1 else 0.5
+        if key.lower() == "space":
+            duration = max(duration, self.minimum_space_duration)
         await self.browser.press_key(
             key,
             lite_mode=self.lite,
@@ -170,6 +223,7 @@ class DOSGameInterface(VideoGameBenchInterface):
 
             action_map = {
                 'click': self.click,
+                'hold_mouse': self.hold_mouse,
                 'move': self.move,
                 'move_mouse': self.move, # Add alias for move_mouse
                 'move_mouse_left': lambda *args: self.move("left", *args),
@@ -188,11 +242,17 @@ class DOSGameInterface(VideoGameBenchInterface):
                 result = "No action provided."
             else:
                 action = action.lower().strip()
+                if self.mouse_only and action in {"write", "press_key", "hold_key"}:
+                    result = (
+                        f"Action {action} is disabled: this game must be played "
+                        "using mouse actions only."
+                    )
+                    action = None
                 if action in action_map.keys():
                     result = await action_map[action](action_input, key_press_delay_ms)
                     if isinstance(result, tuple):
                         result, frames = result
-                else:
+                elif action is not None:
                     result = f"Unknown action: {action}"
 
             # Take screenshots for approximately 0.5 seconds

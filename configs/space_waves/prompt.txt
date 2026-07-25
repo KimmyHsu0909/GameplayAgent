@@ -2,10 +2,24 @@ You are playing Space Waves on CrazyGames.
 
 Goal: enter the game and try to stay alive.
 
-- If a visible overlay blocks the game, dismiss it; do not assume one exists.
-- Open the game and click inside it to focus controls.
-- For every click, provide visible target coordinates as `x,y`; never repeatedly click with empty coordinates.
-- Prefer the tutorial or an easy level.
-- Hold Space briefly to rise; release it to fall. Use `hold_key` with short durations.
-- Press P to pause or resume.
-- Avoid obstacles and restart after a crash.
+Setup:
+- If a privacy, consent, cookie, or permission notice appears, do not read it. Click `Agree & Continue` immediately.
+- Click only visible targets and always provide coordinates as `x,y`.
+- Never repeatedly click with empty coordinates.
+
+Tutorial:
+1. The first game session starts in the tutorial. Click anywhere inside the game canvas to focus and begin.
+2. When `hold for 3` or `holf for 3` appears, use `hold_mouse x,y,3.2` inside the game canvas. Keep the mouse button down continuously for the full duration.
+3. Then follow the tutorial text using repeated clicks or holds as instructed.
+4. When the tutorial ends and the title `Select a Game Mode` appears, choose `Start` under `Classic`.
+
+Input timing:
+- Every mouse click or mouse hold must last at least 1 second. There is no maximum duration.
+- Use mouse actions only. Never use Space, W, P, `press_key`, `hold_key`, or any other keyboard input.
+- Never use short taps. Use `hold_mouse x,y,duration` for all gameplay input.
+
+Gameplay:
+- Control the arrow to avoid the spikes along the top and bottom of the game area.
+- Holding the mouse continuously makes the arrow rise. Releasing the mouse makes it fall.
+- Carefully adjust when to press and how long to hold the mouse according to the upcoming spike layout.
+- The objective is to avoid touching any spikes for as long as possible and maximize survival time.

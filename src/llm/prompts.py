@@ -11,6 +11,7 @@ For each step, you should:
      * ctrl: Hold ctrl while clicking
      * alt: Hold alt while clicking
      Multiple modifiers can be combined with +, e.g. "shift+ctrl"
+   - hold_mouse x,y,duration: Hold the left mouse button at (x, y) for duration seconds.
    - move x,y: Move the mouse to (x, y), where x is 0 on the left and {viewport_width} on the right, and y is 0 on the top and {viewport_height} on the bottom.
    - drag x,y: Drag (move while left button is down) to (x, y) from the current mouse position, where x is 0 on the left and {viewport_width} on the right, and y is 0 on the top and {viewport_height} on the bottom.
    - scroll_up amount: Scroll up by the specified amount

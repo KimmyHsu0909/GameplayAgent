@@ -3,3 +3,5 @@ game: space_waves
 viewport_width: 1280
 viewport_height: 720
 pause_key: KeyP
+minimum_mouse_duration: 1.0
+mouse_only: true

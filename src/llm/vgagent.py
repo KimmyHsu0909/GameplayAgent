@@ -463,6 +463,8 @@ class WebBrowsingVGAgent(VideoGameBenchAgent):
         context_window: int = 10,        # Add this parameter
         lite: bool = False,
         press_key_delay: int = 100,
+        viewport_width: int = 640,
+        viewport_height: int = 400,
         log_dir: Optional[Path] = None,
         enable_ui: bool = False,
         api_base: Optional[str] = None
@@ -509,7 +511,11 @@ class WebBrowsingVGAgent(VideoGameBenchAgent):
         self.conversation_log_file = self.log_dir / "conversation_history.json"
         self.conversation_log_file.touch()
 
-        self.system_instruction_prompt = SYSTEM_PROMPTS["dos"]
+        self.system_instruction_prompt = (
+            SYSTEM_PROMPTS["dos"]
+            .replace("{viewport_width}", str(viewport_width))
+            .replace("{viewport_height}", str(viewport_height))
+        )
         self.system_prompt = {
             "role": "system", 
             "content": f"{self.system_instruction_prompt}\n\n{task_prompt}"

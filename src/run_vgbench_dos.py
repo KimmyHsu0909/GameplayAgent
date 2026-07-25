@@ -102,6 +102,8 @@ async def run_dos_emulator(args):
         enable_ui=args.enable_ui,
         task_prompt=args.task_prompt,
         press_key_delay=args.press_key_delay,
+        viewport_width=getattr(args, "viewport_width", None) or 640,
+        viewport_height=getattr(args, "viewport_height", None) or 400,
         api_base=args.api_base
     )
 
@@ -111,6 +113,7 @@ async def run_dos_emulator(args):
         num_screenshots_per_action=args.num_screenshots_per_action,
         viewport_width=getattr(args, "viewport_width", None),
         viewport_height=getattr(args, "viewport_height", None),
+        pause_key=getattr(args, "pause_key", None),
     )
 
     evaluator = DOSEvaluator(
@@ -123,4 +126,3 @@ async def run_dos_emulator(args):
 
     await evaluator.start(url)
     await evaluator.run_episode(agent, task, server)
-    

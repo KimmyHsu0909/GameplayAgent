@@ -1,0 +1,2 @@
+# Wait for CrazyGames and the Unity game to load.
+sleep 15

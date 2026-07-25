@@ -142,8 +142,17 @@ class BrowserController:
         if not self.page:
             raise ValueError("Browser not started")
         
-        # Capture screenshot in JPEG format
-        screenshot = await self.page.screenshot(type="jpeg", quality=100, clip={"x": 0, "y": 0, "width": 640, "height": 400})
+        viewport = self.page.viewport_size or {"width": 640, "height": 400}
+        screenshot = await self.page.screenshot(
+            type="jpeg",
+            quality=100,
+            clip={
+                "x": 0,
+                "y": 0,
+                "width": viewport["width"],
+                "height": viewport["height"],
+            },
+        )
         logger.info("Screenshot captured")
         return screenshot
         

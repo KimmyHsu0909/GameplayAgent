@@ -19,6 +19,7 @@ class DOSGameInterface(VideoGameBenchInterface):
                  num_screenshots_per_action: int = 0,
                  viewport_width: int = None,
                  viewport_height: int = None,
+                 pause_key: str = None,
                  ):
         super().__init__()
         self.headless = headless
@@ -29,6 +30,7 @@ class DOSGameInterface(VideoGameBenchInterface):
         self.num_screenshots_per_action = num_screenshots_per_action
         self.viewport_width = viewport_width
         self.viewport_height = viewport_height
+        self.pause_key = pause_key or "Alt+Pause"
 
         # Lite condition, can change
         if lite:
@@ -52,7 +54,7 @@ class DOSGameInterface(VideoGameBenchInterface):
         await self.browser.pre_load(self.game)
 
         if self.lite:
-            await self.browser.press_key("Alt+Pause", delay_ms=0)
+            await self.browser.press_key(self.pause_key, delay_ms=0)
     
     
     async def click(self, action_input: str, press_key_delay: float = 0.5) -> str:
@@ -125,9 +127,13 @@ class DOSGameInterface(VideoGameBenchInterface):
 
     async def hold_key(self, action_input: str, delay_ms: float = 100) -> str:
         parts = action_input.split(",")
-        key = parts[0]
+        key = parts[0].strip()
         duration = float(parts[1]) if len(parts) > 1 else 0.5
-        await self.browser.press_key(key, lite_mode=self.lite, delay_ms=duration)
+        await self.browser.press_key(
+            key,
+            lite_mode=self.lite,
+            delay_ms=duration * 1000,
+        )
         result = f"Held key {key} for {duration} seconds"
         return result
 
@@ -146,7 +152,7 @@ class DOSGameInterface(VideoGameBenchInterface):
             frames = []
 
             if self.lite:
-                await self.browser.press_key("Alt+Pause", delay_ms=0)
+                await self.browser.press_key(self.pause_key, delay_ms=0)
                 await asyncio.sleep(0.01)
 
             action_map = {
@@ -184,7 +190,7 @@ class DOSGameInterface(VideoGameBenchInterface):
 
             # Pause game
             if self.lite:
-                await self.browser.press_key("Alt+Pause", delay_ms=0)
+                await self.browser.press_key(self.pause_key, delay_ms=0)
             
             # Under real benchmark (not lite), take screenshot here
             if not frames or len(frames) == 0:
@@ -197,7 +203,7 @@ class DOSGameInterface(VideoGameBenchInterface):
             error_msg = f"Error executing action: {str(e)}"
             
             if self.lite:
-                await self.browser.press_key("Alt+Pause", delay_ms=0)
+                await self.browser.press_key(self.pause_key, delay_ms=0)
             
             screenshot = await self.browser.get_screenshot()
             return error_msg, [screenshot]

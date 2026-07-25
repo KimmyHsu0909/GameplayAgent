@@ -11,8 +11,8 @@ For each step, you should:
      * ctrl: Hold ctrl while clicking
      * alt: Hold alt while clicking
      Multiple modifiers can be combined with +, e.g. "shift+ctrl"
-   - move x,y: Move the mouse to (x, y), where x is 0 on the left and 640 on the right, and y is 0 on the top and 400 on the bottom.
-   - drag x,y: Drag (move while left button is down) to (x, y) from the current mouse position, where x is 0 on the left and 640 on the right, and y is 0 on the top and 400 on the bottom.
+   - move x,y: Move the mouse to (x, y), where x is 0 on the left and {viewport_width} on the right, and y is 0 on the top and {viewport_height} on the bottom.
+   - drag x,y: Drag (move while left button is down) to (x, y) from the current mouse position, where x is 0 on the left and {viewport_width} on the right, and y is 0 on the top and {viewport_height} on the bottom.
    - scroll_up amount: Scroll up by the specified amount
    - scroll_down amount: Scroll down by the specified amount
    - write text: Type the specified text
@@ -23,7 +23,7 @@ For each step, you should:
 You will interact with the game via the keyboard and mouse actions.
 To help you with mouse actions, we provide a thin red grid overlay that intersects the screen at 100x100 pixel intervals (labelled with coordinates divided by 100).
 I also added 4 blue dots 25 pixels away in each direction with their exact coordinates in case you get lost.
-The coordinates start at (0,0) at the top left of the screen, indexed (x,y) and go up to (640,400) at the bottom right. 
+The coordinates start at (0,0) at the top left of the screen, indexed (x,y) and go up to ({viewport_width},{viewport_height}) at the bottom right.
 For example, if you want to click somewhere inside a box with top left corner at (100,100) and bottom right corner at (150,150), you can
 move to (125,125) then click (estimate based on the picture! Try to get it as close as possible, don't rely on multiples of 10).
 

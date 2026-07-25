@@ -18,6 +18,7 @@ class AgentMonitorUI:
         self.root = tk.Tk()
         self.root.title(title)
         self.root.geometry("600x950")  # Made taller to accommodate checkpoints
+        self.ui_screenshot_capture_enabled = True
         
         # Configure dark theme colors
         self.colors = {
@@ -303,6 +304,9 @@ class AgentMonitorUI:
 
     def take_screenshot(self, path: str, name: str) -> None:
         """Take a screenshot of the UI window."""
+        if not self.ui_screenshot_capture_enabled:
+            return
+
         try:
             x = self.root.winfo_rootx()
             y = self.root.winfo_rooty()
@@ -312,7 +316,8 @@ class AgentMonitorUI:
             screenshot = ImageGrab.grab(bbox=(x, y, x+width, y+height))
             screenshot.save(f"{path}/{name}")
         except Exception as e:
-            print(f"Error taking screenshot: {e}")
+            self.ui_screenshot_capture_enabled = False
+            print(f"UI screenshot capture disabled: {e}")
 
     def setup_checkpoints(self, num_checkpoints: int):
         """Set up the checkpoint display boxes."""

@@ -2,7 +2,9 @@ You are playing Space Waves on CrazyGames.
 
 Goal: enter the game and try to stay alive.
 
-- Dismiss overlays, open the game, and click inside it to focus controls.
+- If a visible overlay blocks the game, dismiss it; do not assume one exists.
+- Open the game and click inside it to focus controls.
+- For every click, provide visible target coordinates as `x,y`; never repeatedly click with empty coordinates.
 - Prefer the tutorial or an easy level.
 - Hold Space briefly to rise; release it to fall. Use `hold_key` with short durations.
 - Press P to pause or resume.

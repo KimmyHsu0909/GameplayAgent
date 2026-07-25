@@ -36,6 +36,7 @@ class BrowserController:
         self.current_mouse_position = (0, 0)
         self.paused = False
         self.pause_task = None  # Add this to track the pause task
+        self.last_screenshot = None
     
     async def pre_load(self, game: str) -> None:
         """
@@ -142,19 +143,41 @@ class BrowserController:
         if not self.page:
             raise ValueError("Browser not started")
         
-        viewport = self.page.viewport_size or {"width": 640, "height": 400}
-        screenshot = await self.page.screenshot(
-            type="jpeg",
-            quality=100,
-            clip={
-                "x": 0,
-                "y": 0,
-                "width": viewport["width"],
-                "height": viewport["height"],
-            },
-        )
-        logger.info("Screenshot captured")
-        return screenshot
+        last_error = None
+        for attempt in range(2):
+            try:
+                if self.page.is_closed():
+                    raise RuntimeError("Browser page is closed")
+
+                viewport = self.page.viewport_size or {"width": 640, "height": 400}
+                screenshot = await self.page.screenshot(
+                    type="jpeg",
+                    quality=100,
+                    clip={
+                        "x": 0,
+                        "y": 0,
+                        "width": viewport["width"],
+                        "height": viewport["height"],
+                    },
+                )
+                self.last_screenshot = screenshot
+                logger.info("Screenshot captured")
+                return screenshot
+            except Exception as error:
+                last_error = error
+                logger.warning(
+                    "Screenshot attempt %s failed: %s",
+                    attempt + 1,
+                    error,
+                )
+                if attempt == 0:
+                    await asyncio.sleep(0.1)
+
+        if self.last_screenshot is not None:
+            logger.warning("Using the last successful screenshot")
+            return self.last_screenshot
+
+        raise RuntimeError(f"Unable to capture screenshot: {last_error}") from last_error
         
     async def move_mouse(self, x: float, y: float) -> None:
         """

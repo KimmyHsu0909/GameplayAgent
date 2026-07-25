@@ -309,7 +309,10 @@ class LLMClient:
             # Log the parsed response
             self.file_logger.info(f"Parsed json_str: {json_str}")
 
-            response_dict = json.loads(json_str)
+            # Some local models emit literal newlines inside JSON strings.
+            # strict=False accepts those control characters while preserving
+            # normal JSON validation for the response structure.
+            response_dict = json.loads(json_str, strict=False)
             
             # Ensure the response has the required fields
             required_fields = ["thought", "action", "action_input"]

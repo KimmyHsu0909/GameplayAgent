@@ -59,17 +59,30 @@ class DOSGameInterface(VideoGameBenchInterface):
     
     async def click(self, action_input: str, press_key_delay: float = 0.5) -> str:
         x, y = self.browser.current_mouse_position
+        option_input = action_input or ""
+
+        parts = [part.strip() for part in option_input.split(",")]
+        if len(parts) >= 2:
+            try:
+                x, y = float(parts[0]), float(parts[1])
+                option_input = ",".join(parts[2:])
+            except ValueError:
+                pass
+
+        if not action_input and (x, y) == (0, 0):
+            return "Click ignored at (0, 0): provide visible target coordinates as x,y."
+
         click_options = {}
-        if action_input:
-            if "right" in action_input.lower():
+        if option_input:
+            if "right" in option_input.lower():
                 click_options["button"] = "right"
             
             modifiers = []
-            if "shift" in action_input.lower():
+            if "shift" in option_input.lower():
                 modifiers.append("Shift")
-            if "ctrl" in action_input.lower():
+            if "ctrl" in option_input.lower():
                 modifiers.append("Control")
-            if "alt" in action_input.lower():
+            if "alt" in option_input.lower():
                 modifiers.append("Alt")
             if modifiers:
                 click_options["modifiers"] = modifiers
@@ -203,10 +216,16 @@ class DOSGameInterface(VideoGameBenchInterface):
             error_msg = f"Error executing action: {str(e)}"
             
             if self.lite:
-                await self.browser.press_key(self.pause_key, delay_ms=0)
-            
-            screenshot = await self.browser.get_screenshot()
-            return error_msg, [screenshot]
+                try:
+                    await self.browser.press_key(self.pause_key, delay_ms=0)
+                except Exception as pause_error:
+                    error_msg += f"; pause recovery failed: {pause_error}"
+
+            try:
+                screenshot = await self.browser.get_screenshot()
+                return error_msg, [screenshot]
+            except Exception as screenshot_error:
+                return f"{error_msg}; screenshot recovery failed: {screenshot_error}", []
         
     async def close(self) -> None:
         """Clean up resource[screen]."""

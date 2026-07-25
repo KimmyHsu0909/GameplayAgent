@@ -667,7 +667,12 @@ class WebBrowsingVGAgent(VideoGameBenchAgent):
             
             # Update reflection memory from the JSON response
             memory = react_response.get("memory", "")
-            if memory:  # Only update if memory exists and is not empty
+            memory_placeholder = memory.strip().lower() if isinstance(memory, str) else ""
+            if memory and memory_placeholder not in {
+                "[previous memory]",
+                "previous memory",
+                "[same memory]",
+            }:
                 self.reflection_memory = memory
             
             # Save reflection to consolidated file

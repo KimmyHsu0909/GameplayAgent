@@ -5,7 +5,7 @@ SYSTEM_PROMPTS = {
 For each step, you should:
 1. Think: Analyze the current state and decide what to do next
 2. Action: Choose one of the following actions:
-   - click [options as action_input]: Click the mouse at the current mouse position. Options include:
+   - click x,y[,options]: Move to (x, y) and click. If x,y are omitted, click the current mouse position. Options include:
      * right: Right click instead of left click (default is left click)
      * shift: Hold shift while clicking
      * ctrl: Hold ctrl while clicking
@@ -25,7 +25,7 @@ To help you with mouse actions, we provide a thin red grid overlay that intersec
 I also added 4 blue dots 25 pixels away in each direction with their exact coordinates in case you get lost.
 The coordinates start at (0,0) at the top left of the screen, indexed (x,y) and go up to ({viewport_width},{viewport_height}) at the bottom right.
 For example, if you want to click somewhere inside a box with top left corner at (100,100) and bottom right corner at (150,150), you can
-move to (125,125) then click (estimate based on the picture! Try to get it as close as possible, don't rely on multiples of 10).
+use click with action_input "125,125" (estimate based on the picture! Try to get it as close as possible, don't rely on multiples of 10).
 
 For keyboard actions, use the following format:
 - Single keys: "KeyA", "KeyB", "Digit1", "ArrowLeft", "ArrowUp", "Enter", "Escape", "Backspace", "Tab", "Space"
@@ -55,7 +55,7 @@ Another example of right clicking:
 {
   "thought": "I need to right click on the search box",
   "action": "click",
-  "action_input": "right",
+  "action_input": "125,125,right",
   "memory": ""
 }
 
